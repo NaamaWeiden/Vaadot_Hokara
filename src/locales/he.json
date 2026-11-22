@@ -1,0 +1,52 @@
+{
+  "system-name": "ועדות הוקרה",
+  "close": "סגור",
+  "noResults": "לא נמצאו תוצאות",
+  "unauthorized": {
+      "title": "אין הרשאה",
+      "message": "אין לך הרשאה לגשת למערכת זו."
+  },
+  "sidebar": {
+    "subtitle": "תנ\"ין",
+    "createCommittee": "יצירת ועדה",
+    "manageQuotas": "ניהול מכסות",
+    "searchPlaceholder": "חפש יחידה/ועדה..."
+  },
+  "committee": {
+    "edit": "עריכת ועדה",
+    "link": "קישור לוועדה"
+  },
+  "candidates": {
+    "addToCommittee": "הוספה לועדה",
+    "loadFromExcel": "טעינה מאקסל",
+    "searchPlaceholder": "חפש לפי תיאור (מ\"א, שם, ...)",
+    "emptyGroup": "אין מועמדים",
+    "columns": {
+      "name": "שם",
+      "unit": "יחידה/מסגרת",
+      "rank": "דרגה",
+      "age": "גיל",
+      "tatash": "תת\"ש",
+      "notes": "הערות"
+    },
+    "notes": {
+      "title": "הערות",
+      "placeholder": "הקלד..."
+    },
+    "menu": {
+      "edit": "עריכה",
+      "moveToSummarized": "העברה למסוכמים",
+      "remove": "הסרה מהוועדה"
+    }
+  },
+  "population": {
+    "filterSearch": "חיפוש...",
+    "selectAll": "בחר הכל",
+    "sortAscText": "א-ת",
+    "sortDescText": "ת-א",
+    "sortAscNumber": "מהקטן לגדול",
+    "sortDescNumber": "מהגדול לקטן",
+    "sortAscDate": "מהישן לחדש",
+    "sortDescDate": "מהחדש לישן"
+  }
+}

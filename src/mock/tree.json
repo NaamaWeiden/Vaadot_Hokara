@@ -1,0 +1,25 @@
+[
+  {
+    "key": "south",
+    "label": "פיקוד דרום",
+    "children": [
+      { "key": "south-1", "label": "ועדת תמריצים", "children": [] }
+    ]
+  },
+  {
+    "key": "north",
+    "label": "פיקוד צפון",
+    "children": [
+      { "key": "north-1", "label": "ועדת תמריצים", "children": [] }
+    ]
+  },
+  {
+    "key": "tikshuv",
+    "label": "פיקוד תקשוב",
+    "children": [
+      { "key": "tikshuv-1", "label": "ועדת תמריצים", "children": [] },
+      { "key": "tikshuv-2", "label": "ועדת פעימת אפריל 2026", "children": [] },
+      { "key": "tikshuv-3", "label": "ועדת דרגות", "children": [] }
+    ]
+  }
+]

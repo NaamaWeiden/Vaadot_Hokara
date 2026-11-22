@@ -1,0 +1,100 @@
+@font-face {
+  font-family: 'Heebo';
+  src: url('@/assets/fonts/Heebo-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Heebo';
+  src: url('@/assets/fonts/Heebo-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Heebo';
+  src: url('@/assets/fonts/Heebo-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Heebo';
+  src: url('@/assets/fonts/Heebo-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+body, .v-application {
+  font-family: 'Heebo', sans-serif;
+}
+
+:root {
+  /* Primary Brand Colors */
+  --color-primary: #1e5ff5;
+  --color-primary-hover: #1e40af;
+  --color-primary-light: #edf2fa;
+  --color-primary-light-hover: #e0e7ff;
+
+  /* Neutrals & Text */
+  --color-white: #ffffff;
+  --color-text-main: #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-muted: #475569;
+  --color-text-light: #94a3b8;
+  
+  /* Backgrounds */
+  --color-bg-light: #f1f5f9;
+  --color-bg-lighter: #f8fafc;
+  
+  /* Borders */
+  --color-border-main: #eef2f6;
+  --color-border-light: #c0c8d3;
+  --color-border-lighter: #e2e8f0;
+
+  /* Semantic - Positive */
+  --color-success: #9de6b6;
+  --color-success-bg: #f0fdf4;
+  --color-success-border: #bbf7d0;
+  --color-success-icon-bg: #dcfce7;
+  --color-success-icon: #078d36;
+
+  /* Semantic - Negative */
+  --color-error: #f36d7d;
+  --color-error-bg: #fef2f2;
+  --color-error-border: #fecdd3;
+  --color-error-icon-bg: #fce7f3;
+  --color-error-icon: #df1a31;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;  /* 4px */
+  --spacing-sm: 0.5rem;   /* 8px */
+  --spacing-md: 1rem;     /* 16px */
+  --spacing-lg: 1.5rem;   /* 24px */
+  --spacing-xl: 2rem;     /* 32px */
+  --spacing-2xl: 3rem;    /* 48px */
+
+  /* Radius */
+  --radius-xs: 0.125rem; /* 2px */
+  --radius-sm: 0.25rem;  /* 4px */
+  --radius-md: 0.5rem;   /* 8px */
+  --radius-lg: 0.75rem;  /* 12px */
+  --radius-xl: 1rem;     /* 16px */
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* Typography */
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 1.875rem;  /* 30px */
+}
