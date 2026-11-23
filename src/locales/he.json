@@ -34,9 +34,9 @@
       "placeholder": "הקלד..."
     },
     "menu": {
-      "edit": "עריכה",
-      "moveToSummarized": "העברה למסוכמים",
-      "remove": "הסרה מהוועדה"
+      "summarize": "סכם",
+      "reject": "דחה",
+      "returnToPlanning": "החזר לתכנון"
     }
   },
   "population": {

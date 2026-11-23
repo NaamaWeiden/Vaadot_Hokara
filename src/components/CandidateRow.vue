@@ -48,7 +48,7 @@
         </v-chip>
       </div>
 
-      <div class="cell cell--menu d-flex align-center justify-center">
+      <div class="cell cell--menu d-flex align-center justify-center" @click.stop>
         <v-menu location="bottom end">
           <template #activator="{ props: menuProps }">
             <v-btn
@@ -59,13 +59,13 @@
               density="comfortable"
             />
           </template>
-          <!-- UI only for now: the items have no action yet -->
           <v-list density="compact">
             <v-list-item
               v-for="item in menuItems"
               :key="item.key"
               :prepend-icon="item.icon"
               :title="t(item.label)"
+              @click="emit('moveCandidate', item.toGroupId)"
             />
           </v-list>
         </v-menu>
@@ -118,6 +118,10 @@ const props = defineProps<{
   candidate: Candidate
 }>()
 
+const emit = defineEmits<{
+  moveCandidate: [toGroupId: string]
+}>()
+
 const { t } = useI18n()
 
 const notesOpen = ref(false)
@@ -127,9 +131,24 @@ const singleNote = computed(() =>
 )
 
 const menuItems = [
-  { key: 'edit', icon: 'mdi-pencil-outline', label: 'candidates.menu.edit' },
-  { key: 'summarize', icon: 'mdi-check-circle-outline', label: 'candidates.menu.moveToSummarized' },
-  { key: 'remove', icon: 'mdi-account-remove-outline', label: 'candidates.menu.remove' },
+  {
+    key: 'summarize',
+    icon: 'mdi-check-circle-outline',
+    label: 'candidates.menu.summarize',
+    toGroupId: 'summarized',
+  },
+  {
+    key: 'reject',
+    icon: 'mdi-close-circle-outline',
+    label: 'candidates.menu.reject',
+    toGroupId: 'rejected',
+  },
+  {
+    key: 'returnToPlanning',
+    icon: 'mdi-undo-variant',
+    label: 'candidates.menu.returnToPlanning',
+    toGroupId: 'planning',
+  },
 ]
 
 function toggleNotes() {

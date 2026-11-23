@@ -66,6 +66,10 @@
           :index="index"
           :count="visibleGroups.length"
           @select="scrollToGroup(index)"
+          @move-candidate="
+            (pernr, fromGroupId, toGroupId) =>
+              emit('moveCandidate', pernr, fromGroupId, toGroupId)
+          "
         />
       </div>
     </div>
@@ -88,6 +92,10 @@ import NoContent from './NoContent.vue'
 const props = defineProps<{
   groups: CandidateGroupType[]
   loading: boolean
+}>()
+
+const emit = defineEmits<{
+  moveCandidate: [pernr: string, fromGroupId: string, toGroupId: string]
 }>()
 
 const { t } = useI18n()
@@ -153,7 +161,7 @@ const {
 .ct-scroll {
   min-height: 0;
   /* Height of one sticky group header (CandidateGroup) */
-  --group-header-height: 2.25rem;
+  --group-header-height: 2.35rem;
 }
 
 .ct-columns {

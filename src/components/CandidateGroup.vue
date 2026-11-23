@@ -24,6 +24,9 @@
         v-for="candidate in group.candidates"
         :key="candidate.pernr"
         :candidate="candidate"
+        @move-candidate="
+          (toGroupId) => emit('moveCandidate', candidate.pernr, group.id, toGroupId)
+        "
       />
       <div v-if="group.candidates.length === 0" class="group-empty py-2 px-3">
         {{ t('candidates.emptyGroup') }}
@@ -47,6 +50,7 @@ defineProps<{
 
 const emit = defineEmits<{
   select: []
+  moveCandidate: [pernr: string, fromGroupId: string, toGroupId: string]
 }>()
 
 const { t } = useI18n()
@@ -73,6 +77,7 @@ const { t } = useI18n()
 }
 
 .group-header {
+  height: calc(100% - 0.5rem);
   min-width: max-content;
   border: none;
   background: var(--color-border-lighter);

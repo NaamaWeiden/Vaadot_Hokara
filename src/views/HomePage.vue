@@ -11,6 +11,7 @@
           class="flex-1-1-0"
           :groups="candidatesStore.groups"
           :loading="candidatesStore.isLoading"
+          @move-candidate="moveCandidate"
         />
       </div>
     </v-main>
@@ -30,6 +31,10 @@ const { width } = useDisplay()
 const candidatesStore = useCandidatesStore()
 
 const selectedCommittee = ref<Committee | null>(null)
+
+function moveCandidate(pernr: string, fromGroupId: string, toGroupId: string) {
+  candidatesStore.moveCandidate(pernr, fromGroupId, toGroupId)
+}
 
 // TODO: later, load the candidates of the committee selected in the sidebar
 onMounted(() => {
