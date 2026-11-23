@@ -73,6 +73,25 @@
         />
       </div>
     </div>
+
+    <!--
+      Floating card of the dragged candidate. It is rendered inside the table (not teleported)
+      so it keeps --candidates-columns; position: fixed lets it follow the cursor over the whole page.
+    -->
+    <div
+      v-if="drag.candidate"
+      class="drag-card"
+      :style="{
+        width: `${drag.width}px`,
+        transform: `translate(${drag.x - drag.offsetX}px, ${drag.y - drag.offsetY}px)`,
+      }"
+    >
+      <CandidateRow
+        class="drag-card__row"
+        :candidate="drag.candidate"
+        :group-id="drag.fromGroupId ?? ''"
+      />
+    </div>
   </div>
 </template>
 
@@ -83,9 +102,11 @@ import { useElementSize } from '@vueuse/core'
 import type { CandidateGroup as CandidateGroupType } from '@/types/candidates'
 import type { TableHeader } from '@/types/table'
 import { useCandidatesTable } from '@/composables/useCandidatesTable'
+import { useCandidateDrag } from '@/composables/useCandidateDrag'
 import Btn from './Btn.vue'
 import ColumnFilterMenu from './ColumnFilterMenu.vue'
 import CandidateGroup from './CandidateGroup.vue'
+import CandidateRow from './CandidateRow.vue'
 import LoaderOverlay from './LoaderOverlay.vue'
 import NoContent from './NoContent.vue'
 
@@ -99,6 +120,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const { drag } = useCandidateDrag()
 
 // The sticky group headers dock right under the column headers, so their height is needed
 const columnsEl = ref<HTMLElement | null>(null)
@@ -184,5 +206,37 @@ const {
 .ct-groups {
   min-width: max-content;
   background: var(--color-bg-lighter);
+}
+
+/* ── Floating drag card ──────────────────────────────── */
+.drag-card {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2000;
+  /* Lets elementFromPoint see the drop zone under the card */
+  pointer-events: none;
+}
+
+/* Lift effect: the row grows a bit and gets a deep shadow, like it was picked off the table */
+.drag-card .drag-card__row {
+  transform: scale(1.02) rotate(-0.6deg);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.22);
+  animation: drag-card-lift 0.15s ease-out;
+}
+
+@keyframes drag-card-lift {
+  from {
+    transform: none;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+}
+</style>
+
+<style>
+/* Grabbing cursor on the whole page while a candidate is dragged (class set by useCandidateDrag) */
+body.candidate-dragging,
+body.candidate-dragging * {
+  cursor: grabbing !important;
 }
 </style>

@@ -1,6 +1,7 @@
 <template>
   <div class="candidate-row rounded-lg">
-    <div class="row-card pa-2"  @click="toggleNotes">
+    <!-- Quick click opens the notes, long press / press + move drags the row (useCandidateDrag) -->
+    <div class="row-card pa-2" @pointerdown="onPressRow" @dragstart.prevent>
       <!-- Name: avatar + name + pernr (based on PopulationCell's name cell) -->
       <div class="cell d-flex align-center ga-3 px-2">
         <v-avatar size="36">
@@ -48,7 +49,7 @@
         </v-chip>
       </div>
 
-      <div class="cell cell--menu d-flex align-center justify-center" @click.stop>
+      <div class="cell cell--menu d-flex align-center justify-center" @click.stop @pointerdown.stop>
         <v-menu location="bottom end">
           <template #activator="{ props: menuProps }">
             <v-btn
@@ -113,9 +114,12 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Candidate } from '@/types/candidates'
 import { formatDateString } from '@/utils/dateUtils'
+import { useCandidateDrag } from '@/composables/useCandidateDrag'
 
 const props = defineProps<{
   candidate: Candidate
+  // The group (status) the row is in - the drag needs it to know where the candidate came from
+  groupId: string
 }>()
 
 const emit = defineEmits<{
@@ -123,6 +127,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const { startPress } = useCandidateDrag()
 
 const notesOpen = ref(false)
 
@@ -154,6 +159,13 @@ const menuItems = [
 function toggleNotes() {
   notesOpen.value = !notesOpen.value
 }
+
+function onPressRow(event: PointerEvent) {
+  startPress(event, props.candidate, props.groupId, {
+    onClick: toggleNotes,
+    onDrop: (toGroupId) => emit('moveCandidate', toGroupId),
+  })
+}
 </script>
 
 <style scoped>
@@ -169,11 +181,19 @@ function toggleNotes() {
   box-shadow: 0 2px 6px rgba(15, 23, 42, 0.07);
 }
 
+/* The row being dragged stays in place, faded, while the floating card follows the cursor */
+.candidate-row.is-drag-source {
+  opacity: 0.4;
+}
+
 /* Same grid as the header row: --candidates-columns is defined once in CandidatesTable */
 .row-card {
   display: grid;
   grid-template-columns: var(--candidates-columns);
   align-items: stretch;
+  cursor: pointer;
+  /* Pressing and moving must drag the row, not select its text */
+  user-select: none;
 }
 
 .cell {

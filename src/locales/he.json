@@ -37,6 +37,10 @@
       "summarize": "סכם",
       "reject": "דחה",
       "returnToPlanning": "החזר לתכנון"
+    },
+    "undo": {
+      "message": "{name} הועבר ל{status}",
+      "action": "בטל"
     }
   },
   "population": {
