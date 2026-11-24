@@ -13,7 +13,9 @@
       </div>
 
       <v-text-field
+        ref="searchField"
         v-model="search"
+        v-model:focused="searchFocused"
         class="ct-search"
         :placeholder="t('candidates.searchPlaceholder')"
         prepend-inner-icon="mdi-magnify"
@@ -22,6 +24,48 @@
         rounded="lg"
         hide-details
       />
+
+      <!--
+        Search suggestions under the field. Opening/closing is fully controlled by showSuggestions:
+        the menu is only positioned by the field (target, no activator), and the empty
+        update:model-value handler ignores the menu's own close attempts (click outside, Escape).
+        capture-focus=false keeps the focus in the field while typing.
+      -->
+      <v-menu
+        :model-value="showSuggestions"
+        :target="searchField?.$el"
+        :capture-focus="false"
+        location="bottom"
+        offset="4"
+        @update:model-value="() => {}"
+      >
+        <v-list class="ct-suggestions" dir="rtl" density="compact">
+          <!-- mousedown.prevent: keeps the focus in the field, so the menu does not close before the click -->
+          <v-list-item
+            v-for="candidate in suggestions"
+            :key="candidate.pernr"
+            @mousedown.prevent
+            @click="selectSuggestion(candidate)"
+          >
+            <template #prepend>
+              <v-avatar size="32">
+                <v-img
+                  v-if="candidate.avatar && !failedAvatars.has(candidate.pernr)"
+                  :src="candidate.avatar"
+                  alt=""
+                  @error="failedAvatars.add(candidate.pernr)"
+                />
+                <v-icon v-else size="32" color="blue-lighten-4">mdi-account-circle</v-icon>
+              </v-avatar>
+            </template>
+            <div class="d-flex align-baseline ga-2">
+              <span class="ct-suggestion-name font-weight-bold">{{ candidate.name }}</span>
+              <span class="ct-suggestion-meta">{{ candidate.pernr }}</span>
+            </div>
+            <div class="ct-suggestion-meta">{{ getCandidateValue(candidate, 'rank') }}</div>
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </div>
 
     <!-- Scrollable area -->
@@ -96,12 +140,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useElementSize } from '@vueuse/core'
-import type { CandidateGroup as CandidateGroupType } from '@/types/candidates'
+import type { VTextField } from 'vuetify/components'
+import type { Candidate, CandidateGroup as CandidateGroupType } from '@/types/candidates'
 import type { TableHeader } from '@/types/table'
 import { useCandidatesTable } from '@/composables/useCandidatesTable'
+import { getCandidateValue } from '@/utils/candidates.utils'
 import { useCandidateDrag } from '@/composables/useCandidateDrag'
 import Btn from './Btn.vue'
 import ColumnFilterMenu from './ColumnFilterMenu.vue'
@@ -117,6 +163,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   moveCandidate: [pernr: string, fromGroupId: string, toGroupId: string]
+  select: [candidate: Candidate]
 }>()
 
 const { t } = useI18n()
@@ -163,10 +210,27 @@ const {
   sortDesc,
   columnFilters,
   visibleGroups,
+  suggestions,
   getValueOptions,
   setSort,
   setFilter,
 } = useCandidatesTable(() => props.groups, columns)
+
+const searchField = ref<VTextField | null>(null)
+const searchFocused = ref(false)
+
+// suggestions is already empty while the field is empty
+const showSuggestions = computed(() => searchFocused.value && suggestions.value.length > 0)
+
+// pernrs whose avatar failed to load - kept per row, so one broken image does not hide the others
+const failedAvatars = reactive(new Set<string>())
+
+// Puts the person's name in the search (so the table filters by it) and closes the suggestions
+function selectSuggestion(candidate: Candidate) {
+  search.value = candidate.name
+  emit('select', candidate)
+  searchField.value?.blur()
+}
 </script>
 
 <style scoped>
@@ -177,6 +241,17 @@ const {
 
 .ct-search {
   flex: 0 0 17rem;
+}
+
+/* Same look as the name cell in CandidateRow */
+.ct-suggestion-name {
+  font-size: var(--font-size-base);
+  color: var(--color-text-main);
+}
+
+.ct-suggestion-meta {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-light);
 }
 
 /* Lets the scrollable area shrink inside the column flex layout, so it scrolls */

@@ -4,6 +4,8 @@ import type { TableHeader } from '@/types/table'
 import type { FilterValueOption } from '@/components/ColumnFilterMenu.vue'
 import { getCandidateValue, formatCandidateValue, compareCandidateValues } from '@/utils/candidates.utils'
 
+const SUGGESTIONS_LIMIT = 8
+
 // Search, column filter and sort for the candidates table, applied inside every group.
 // Based on usePopulationTable from allocation-infrastructure (without pagination).
 export function useCandidatesTable(
@@ -52,6 +54,13 @@ export function useCandidatesTable(
     }))
   })
 
+  // Suggestions under the search field: the first matching candidates in table order
+  // (visibleGroups is already searched, column-filtered and sorted). Empty while nothing is typed.
+  const suggestions = computed<Candidate[]>(() => {
+    if (!search.value.trim()) return []
+    return visibleGroups.value.flatMap((group) => group.candidates).slice(0, SUGGESTIONS_LIMIT)
+  })
+
   const visibleCount = computed(() =>
     visibleGroups.value.reduce((count, group) => count + group.candidates.length, 0)
   )
@@ -90,6 +99,7 @@ export function useCandidatesTable(
     columnFilters,
     visibleGroups,
     visibleCount,
+    suggestions,
     getValueOptions,
     setSort,
     setFilter,
