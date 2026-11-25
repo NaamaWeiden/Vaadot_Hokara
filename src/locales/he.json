@@ -26,6 +26,11 @@
     "loadFromExcel": "טעינה מאקסל",
     "searchPlaceholder": "חפש לפי תיאור (מ\"א, שם, ...)",
     "emptyGroup": "אין מועמדים",
+    "status": {
+      "summarized": "מסוכמים",
+      "planning": "בתכנון",
+      "rejected": "נדחו"
+    },
     "columns": {
       "name": "שם",
       "unit": "יחידה/מסגרת",

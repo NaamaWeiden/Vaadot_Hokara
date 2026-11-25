@@ -26,7 +26,7 @@ import { useI18n } from 'vue-i18n'
 import RightSidebar from '@/components/RightSidebar.vue'
 import CandidatesTable from '@/components/CandidatesTable.vue'
 import CommitteeHeader from '@/components/CommitteeHeader.vue'
-import { useCandidatesStore } from '@/stores/candidatesStore'
+import { CANDIDATE_STATUSES, useCandidatesStore } from '@/stores/candidatesStore'
 import { useNotificationStore } from '@/stores/notificationStore'
 import type { Committee } from '@/types/treeTypes'
 
@@ -38,21 +38,19 @@ const notification = useNotificationStore()
 const selectedCommittee = ref<Committee | null>(null)
 
 // After a move (by drag or by the row menu) a success message offers to undo it
-function moveCandidate(pernr: string, fromGroupId: string, toGroupId: string) {
-  const fromGroup = candidatesStore.groups.find((group) => group.id === fromGroupId)
-  const toGroup = candidatesStore.groups.find((group) => group.id === toGroupId)
-  const candidate = fromGroup?.candidates.find((c) => c.pernr === pernr)
+function moveCandidate(pernr: string, toStatus: string) {
+  const candidate = candidatesStore.candidates.find((c) => c.pernr === pernr)
+  const target = CANDIDATE_STATUSES.find((status) => status.id === toStatus)
 
-  const source = candidatesStore.moveCandidate(pernr, fromGroupId, toGroupId)
-  if (!source || !candidate || !toGroup) return
+  const fromStatus = candidatesStore.moveCandidate(pernr, toStatus)
+  if (!fromStatus || !candidate || !target) return
 
   notification.success(
-    t('candidates.undo.message', { name: candidate.name, status: toGroup.title }),
+    t('candidates.undo.message', { name: candidate.name, status: t(target.titleKey) }),
     {
       text: t('candidates.undo.action'),
-      // Moves the candidate back to the group and the position it came from
-      onClick: () =>
-        candidatesStore.moveCandidate(pernr, toGroupId, source.fromGroupId, source.fromIndex),
+      // Puts the candidate back in the status it came from
+      onClick: () => candidatesStore.moveCandidate(pernr, fromStatus),
     }
   )
 }

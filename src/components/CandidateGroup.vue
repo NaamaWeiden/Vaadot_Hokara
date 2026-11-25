@@ -16,7 +16,7 @@
         :data-status="group.id"
         @click="emit('select')"
       >
-        <span class="group-header__title font-weight-bold">{{ group.title }}</span>
+        <span class="group-header__title font-weight-bold">{{ t(group.titleKey) }}</span>
         <span>({{ group.candidates.length }})</span>
         <span v-if="group.totalAmount !== undefined">
           ( {{ formatAmount(group.totalAmount) }} )
@@ -34,9 +34,7 @@
           'is-drag-source': drag.candidate?.pernr === candidate.pernr,
           'is-just-added': highlightPernr === candidate.pernr,
         }"
-        @move-candidate="
-          (toGroupId) => emit('moveCandidate', candidate.pernr, group.id, toGroupId)
-        "
+        @move-candidate="(toGroupId) => emit('moveCandidate', candidate.pernr, toGroupId)"
       />
       <div v-if="group.candidates.length === 0" class="group-empty py-2 px-3">
         {{ t('candidates.emptyGroup') }}
@@ -64,7 +62,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   select: []
-  moveCandidate: [pernr: string, fromGroupId: string, toGroupId: string]
+  moveCandidate: [pernr: string, toGroupId: string]
 }>()
 
 const { t } = useI18n()

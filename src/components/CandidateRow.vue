@@ -113,7 +113,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { Candidate } from '@/types/candidates'
+import type { Candidate, CandidateStatus } from '@/types/candidates'
 import { formatDateString } from '@/utils/dateUtils'
 import { useCandidateDrag } from '@/composables/useCandidateDrag'
 
@@ -136,7 +136,7 @@ const singleNote = computed(() =>
   props.candidate.notes.length === 1 ? props.candidate.notes[0] : undefined
 )
 
-const menuItems = [
+const menuItems: { key: string; icon: string; label: string; toGroupId: CandidateStatus }[] = [
   {
     key: 'summarize',
     icon: 'mdi-check-circle-outline',

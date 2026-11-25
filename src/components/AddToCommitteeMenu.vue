@@ -89,7 +89,7 @@ import type { VTextField } from 'vuetify/components'
 import { useCandidatesStore } from '@/stores/candidatesStore'
 import { useNotificationStore } from '@/stores/notificationStore'
 import { getCandidateSearchTerm } from '@/utils/candidates.utils'
-import type { Candidate } from '@/types/candidates'
+import type { AvailableCandidate } from '@/types/candidates'
 import Btn from './Btn.vue'
 
 const SEARCH_DEBOUNCE_MS = 300
@@ -149,7 +149,7 @@ watch(open, (isOpen) => {
 })
 
 // Closing the menu also resets the search (see the watch on open)
-function addCandidate(candidate: Candidate) {
+function addCandidate(candidate: AvailableCandidate) {
   if (candidatesStore.addCandidateToCommittee(candidate)) {
     notification.success(t('notifications.addedToCommittee', { name: candidate.name }))
     emit('added', candidate.pernr)

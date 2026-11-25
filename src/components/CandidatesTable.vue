@@ -111,10 +111,7 @@
           :count="visibleGroups.length"
           :highlight-pernr="highlightedPernr"
           @select="scrollToGroup(index)"
-          @move-candidate="
-            (pernr, fromGroupId, toGroupId) =>
-              emit('moveCandidate', pernr, fromGroupId, toGroupId)
-          "
+          @move-candidate="(pernr, toGroupId) => emit('moveCandidate', pernr, toGroupId)"
         />
       </div>
     </div>
@@ -166,7 +163,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  moveCandidate: [pernr: string, fromGroupId: string, toGroupId: string]
+  moveCandidate: [pernr: string, toGroupId: string]
   select: [candidate: Candidate]
 }>()
 

@@ -1,7 +1,7 @@
 import apiClient from './apiClient'
-import type { Candidate, CandidateGroup } from '@/types/candidates'
+import type { AvailableCandidate, Candidate } from '@/types/candidates'
 
-import mockData from '@/mock/candidates.json'
+import mockCandidates from '@/mock/candidates.json'
 import mockAvailableCandidates from '@/mock/availableCandidates.json'
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
@@ -9,21 +9,22 @@ const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
 // OData string literals escape a single quote by doubling it
 const toODataString = (value: string) => `'${value.replace(/'/g, "''")}'`
 
-// TODO: replace CandidateGroupSet (and its $expand) with the real EntitySet once the service exists
-export const getCandidateGroups = async (): Promise<CandidateGroup[]> => {
+// All the committee's candidates in one flat list - each one has its own status
+// TODO: replace CommitteeCandidateSet with the real EntitySet once the service exists
+export const getCommitteeCandidates = async (): Promise<Candidate[]> => {
   if (USE_MOCK) {
-    return new Promise((resolve) => setTimeout(() => resolve(mockData as CandidateGroup[]), 500))
+    return new Promise((resolve) => setTimeout(() => resolve(mockCandidates as Candidate[]), 500))
   }
 
   try {
-    const response = await apiClient.get('/CandidateGroupSet', {
+    const response = await apiClient.get('/CommitteeCandidateSet', {
       params: {
-        $expand: 'candidates/notes'
+        $expand: 'notes'
       }
     })
-    return response.data as CandidateGroup[]
+    return response.data as Candidate[]
   } catch (error) {
-    console.error('Failed to fetch CandidateGroupSet from SAP.', error)
+    console.error('Failed to fetch CommitteeCandidateSet from SAP.', error)
     throw error
   }
 }
@@ -34,12 +35,12 @@ export const getCandidateGroups = async (): Promise<CandidateGroup[]> => {
 export const getAvailableCandidates = async (
   committeeKey: string,
   searchTerm: string
-): Promise<Candidate[]> => {
+): Promise<AvailableCandidate[]> => {
   if (USE_MOCK) {
     // Simulates the server-side search on the mock list
     const term = searchTerm.toLowerCase()
     const pernrTerm = searchTerm.replace(/\s/g, '')
-    const result = (mockAvailableCandidates as Candidate[]).filter(
+    const result = (mockAvailableCandidates as AvailableCandidate[]).filter(
       (candidate) =>
         candidate.name.toLowerCase().includes(term) || candidate.pernr.includes(pernrTerm)
     )
@@ -52,7 +53,7 @@ export const getAvailableCandidates = async (
         $filter: `CommitteeKey eq ${toODataString(committeeKey)} and SearchTerm eq ${toODataString(searchTerm)}`
       }
     })
-    return response.data as Candidate[]
+    return response.data as AvailableCandidate[]
   } catch (error) {
     console.error('Failed to fetch AvailableCandidateSet from SAP.', error)
     throw error
