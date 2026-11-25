@@ -92,6 +92,14 @@ export function useCandidatesTable(
     }
   }
 
+  // Clears the search and every column filter, so all the candidates are shown
+  function resetFilters() {
+    search.value = ''
+    for (const field of Object.keys(columnFilters)) {
+      delete columnFilters[field]
+    }
+  }
+
   return {
     search,
     sortBy,
@@ -103,5 +111,6 @@ export function useCandidatesTable(
     getValueOptions,
     setSort,
     setFilter,
+    resetFilters,
   }
 }

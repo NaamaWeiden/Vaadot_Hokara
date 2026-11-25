@@ -30,7 +30,10 @@
         :key="candidate.pernr"
         :candidate="candidate"
         :group-id="group.id"
-        :class="{ 'is-drag-source': drag.candidate?.pernr === candidate.pernr }"
+        :class="{
+          'is-drag-source': drag.candidate?.pernr === candidate.pernr,
+          'is-just-added': highlightPernr === candidate.pernr,
+        }"
         @move-candidate="
           (toGroupId) => emit('moveCandidate', candidate.pernr, group.id, toGroupId)
         "
@@ -55,6 +58,8 @@ const props = defineProps<{
   // Position of the group in the list and the number of groups - used for the sticky offsets
   index: number
   count: number
+  // The candidate that was just added to the committee - its row blinks for a moment
+  highlightPernr?: string | null
 }>()
 
 const emit = defineEmits<{

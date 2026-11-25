@@ -1,5 +1,6 @@
 <template>
-  <div class="candidate-row rounded-lg">
+  <!-- data-pernr: lets the table find this row to scroll to it (see scrollToCandidate in CandidatesTable) -->
+  <div class="candidate-row rounded-lg" :data-pernr="candidate.pernr">
     <!-- Quick click opens the notes, long press / press + move drags the row (useCandidateDrag) -->
     <div class="row-card pa-2" @pointerdown="onPressRow" @dragstart.prevent>
       <!-- Name: avatar + name + pernr (based on PopulationCell's name cell) -->
@@ -184,6 +185,31 @@ function onPressRow(event: PointerEvent) {
 /* The row being dragged stays in place, faded, while the floating card follows the cursor */
 .candidate-row.is-drag-source {
   opacity: 0.4;
+}
+
+/*
+ * Just added to the committee: a primary frame that blinks twice over a light background, then fades.
+ * The duration must match HIGHLIGHT_MS in CandidatesTable, which removes the class.
+ * The frame is inset, so the sticky group headers right above the row do not hide its top edge.
+ */
+.candidate-row.is-just-added {
+  animation: just-added 1.5s ease-out;
+}
+
+@keyframes just-added {
+  0%,
+  40% {
+    background: var(--color-primary-light);
+    box-shadow: inset 0 0 0 2px var(--color-primary);
+  }
+  20% {
+    background: var(--color-primary-light);
+    box-shadow: inset 0 0 0 2px transparent;
+  }
+  100% {
+    background: var(--color-white);
+    box-shadow: inset 0 0 0 2px transparent;
+  }
 }
 
 /* Same grid as the header row: --candidates-columns is defined once in CandidatesTable */

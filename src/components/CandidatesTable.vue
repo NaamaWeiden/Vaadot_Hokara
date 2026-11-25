@@ -8,7 +8,7 @@
     <!-- Top bar: actions + search (fixed, does not scroll) -->
     <div class="d-flex align-center justify-space-between ga-4 py-3 px-4 flex-shrink-0">
       <div class="d-flex ga-2">
-        <AddToCommitteeMenu :committee-key="committeeKey" />
+        <AddToCommitteeMenu :committee-key="committeeKey" @added="onCandidateAdded" />
         <Btn :text="t('candidates.loadFromExcel')" icon="mdi-tray-arrow-up" />
       </div>
 
@@ -109,6 +109,7 @@
           :group="group"
           :index="index"
           :count="visibleGroups.length"
+          :highlight-pernr="highlightedPernr"
           @select="scrollToGroup(index)"
           @move-candidate="
             (pernr, fromGroupId, toGroupId) =>
@@ -140,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useElementSize } from '@vueuse/core'
 import type { VTextField } from 'vuetify/components'
@@ -178,21 +179,62 @@ const { height: columnsHeight } = useElementSize(columnsEl, undefined, { box: 'b
 
 const scrollEl = ref<HTMLElement | null>(null)
 
+// Fallback for browsers without the scrollend event - a smooth scroll is done by then
+const SCROLL_END_FALLBACK_MS = 1000
+
+// Scrolls so the element shows right under the sticky stack at the top: the column headers
+// and the headers of the groups up to and including its own group (groupIndex).
+// The element must be inside a group's rows area ([data-group-body]) or be that area itself.
+// Resolves when the smooth scroll ends.
+function scrollUnderHeaders(element: HTMLElement, groupIndex: number): Promise<void> {
+  const container = scrollEl.value
+  const body = element.closest<HTMLElement>('[data-group-body]')
+  const headerHeight = (body?.previousElementSibling as HTMLElement | null)?.offsetHeight
+  if (!container || headerHeight === undefined) return Promise.resolve()
+
+  // Rows and the rows area are not sticky, so their position is the real position in the scroll content
+  const elementTop =
+    element.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop
+  const maxTop = container.scrollHeight - container.clientHeight
+  const top = Math.min(
+    Math.max(elementTop - columnsHeight.value - (groupIndex + 1) * headerHeight, 0),
+    maxTop
+  )
+
+  // Already there: nothing scrolls, so no scrollend event would come
+  if (Math.abs(top - container.scrollTop) < 1) return Promise.resolve()
+
+  return new Promise((resolve) => {
+    const done = () => {
+      clearTimeout(fallback)
+      container.removeEventListener('scrollend', done)
+      resolve()
+    }
+    const fallback = setTimeout(done, SCROLL_END_FALLBACK_MS)
+    container.addEventListener('scrollend', done)
+    container.scrollTo({ top, behavior: 'smooth' })
+  })
+}
+
 // Scrolls so the group's header docks at its place in the top stack and its rows show right under it
 function scrollToGroup(index: number) {
-  const container = scrollEl.value
   const group = visibleGroups.value[index]
-  if (!container || !group) return
+  if (!group) return
+  const body = scrollEl.value?.querySelector<HTMLElement>(
+    `[data-group-body="${CSS.escape(group.id)}"]`
+  )
+  if (body) scrollUnderHeaders(body, index)
+}
 
-  const body = container.querySelector<HTMLElement>(`[data-group-body="${CSS.escape(group.id)}"]`)
-  const headerHeight = (body?.previousElementSibling as HTMLElement | null)?.offsetHeight
-  if (!body || headerHeight === undefined) return
-
-  // The rows container is not sticky, so its position is the real position in the scroll content
-  const bodyTop =
-    body.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop
-  const top = bodyTop - columnsHeight.value - (index + 1) * headerHeight
-  container.scrollTo({ top, behavior: 'smooth' })
+// Scrolls so the candidate's row shows at the top of the table, right under the sticky headers.
+// Resolves when the scroll ends.
+function scrollToCandidate(pernr: string): Promise<void> {
+  const groupIndex = visibleGroups.value.findIndex((group) =>
+    group.candidates.some((candidate) => candidate.pernr === pernr)
+  )
+  const row = scrollEl.value?.querySelector<HTMLElement>(`[data-pernr="${CSS.escape(pernr)}"]`)
+  if (groupIndex === -1 || !row) return Promise.resolve()
+  return scrollUnderHeaders(row, groupIndex)
 }
 
 // Column widths, in RTL order: name | unit | rank | age | tatash | notes | menu
@@ -217,6 +259,7 @@ const {
   getValueOptions,
   setSort,
   setFilter,
+  resetFilters,
 } = useCandidatesTable(() => props.groups, columns)
 
 const searchField = ref<VTextField | null>(null)
@@ -234,6 +277,36 @@ function selectSuggestion(candidate: Candidate) {
   emit('select', candidate)
   searchField.value?.blur()
 }
+
+// Must match the is-just-added animation duration in CandidateRow
+const HIGHLIGHT_MS = 1500
+
+// The candidate that was just added to the committee - its row blinks until the timer clears it
+const highlightedPernr = ref<string | null>(null)
+let highlightTimer: ReturnType<typeof setTimeout> | undefined
+
+function isCandidateVisible(pernr: string): boolean {
+  return visibleGroups.value.some((group) =>
+    group.candidates.some((candidate) => candidate.pernr === pernr)
+  )
+}
+
+// A candidate was added from the "add to committee" menu: show it at the top of the table and highlight it
+async function onCandidateAdded(pernr: string) {
+  // The table search / column filters may hide the new candidate - clear them only in that case
+  if (!isCandidateVisible(pernr)) resetFilters()
+
+  // Wait until the new row is rendered, so it can be found and measured
+  await nextTick()
+  // The blink starts once the row has arrived, so it is not spent while the row is still scrolling in
+  await scrollToCandidate(pernr)
+
+  highlightedPernr.value = pernr
+  clearTimeout(highlightTimer)
+  highlightTimer = setTimeout(() => (highlightedPernr.value = null), HIGHLIGHT_MS)
+}
+
+onBeforeUnmount(() => clearTimeout(highlightTimer))
 </script>
 
 <style scoped>

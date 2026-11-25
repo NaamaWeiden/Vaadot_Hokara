@@ -99,6 +99,11 @@ const props = defineProps<{
   committeeKey?: string
 }>()
 
+const emit = defineEmits<{
+  // The candidate was added to the committee - the table scrolls to the new row and highlights it
+  added: [pernr: string]
+}>()
+
 const { t } = useI18n()
 const candidatesStore = useCandidatesStore()
 const notification = useNotificationStore()
@@ -147,6 +152,7 @@ watch(open, (isOpen) => {
 function addCandidate(candidate: Candidate) {
   if (candidatesStore.addCandidateToCommittee(candidate)) {
     notification.success(t('notifications.addedToCommittee', { name: candidate.name }))
+    emit('added', candidate.pernr)
   }
   open.value = false
 }
