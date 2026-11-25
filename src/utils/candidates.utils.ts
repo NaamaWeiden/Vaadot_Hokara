@@ -39,3 +39,19 @@ export function compareCandidateValues(a: string, b: string, column: TableHeader
 export function formatAmount(amount: number): string {
   return `${amount.toLocaleString('he-IL')} ₪`
 }
+
+const MIN_PERNR_DIGITS = 6
+const MIN_NAME_LETTERS = 3
+
+// The term to send to the server when searching for candidates to add, or null while the input is too short.
+// Only digits = a pernr (needs 6 digits); anything with letters = a name (needs 3 letters, digits are kept in it).
+// Spaces are not counted; the term is sent trimmed, with its inner spaces.
+export function getCandidateSearchTerm(input: string): string | null {
+  const term = input.trim()
+  const chars = term.replace(/\s/g, '')
+  if (/^\d+$/.test(chars)) {
+    return chars.length >= MIN_PERNR_DIGITS ? term : null
+  }
+  const letters = chars.match(/\p{L}/gu)?.length ?? 0
+  return letters >= MIN_NAME_LETTERS ? term : null
+}
