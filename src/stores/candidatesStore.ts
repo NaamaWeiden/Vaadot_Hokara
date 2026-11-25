@@ -1,16 +1,27 @@
 import { defineStore } from 'pinia'
-import { getCandidateGroups } from '@/DL/candidates'
-import type { CandidateGroup } from '@/types/candidates'
+import { getAvailableCandidates, getCandidateGroups } from '@/DL/candidates'
+import { useNotificationStore } from '@/stores/notificationStore'
+import type { Candidate, CandidateGroup } from '@/types/candidates'
 
 export interface CandidateMoveSource {
   fromGroupId: string
   fromIndex: number
 }
 
+// The group a candidate added to the committee goes into
+const ADD_TO_COMMITTEE_GROUP_ID = 'planning'
+
+// Id of the latest search for candidates to add - an older response that arrives late is ignored
+let availableSearchId = 0
+
 export const useCandidatesStore = defineStore('candidates', {
   state: () => ({
     groups: [] as CandidateGroup[],
     isLoading: false as boolean,
+    // Search results of the "add to committee" menu
+    availableCandidates: [] as Candidate[],
+    // The term availableCandidates belong to - set when a response arrives (null = no search yet)
+    availableSearchTerm: null as string | null,
   }),
 
   actions: {
@@ -22,6 +33,7 @@ export const useCandidatesStore = defineStore('candidates', {
         this.groups = await getCandidateGroups()
       } catch (err) {
         console.error('Failed to load candidates from server', err)
+        useNotificationStore().error(err)
       } finally {
         this.isLoading = false
       }
@@ -49,6 +61,44 @@ export const useCandidatesStore = defineStore('candidates', {
       toGroup.candidates.splice(index, 0, candidate)
 
       return { fromGroupId, fromIndex }
+    },
+
+    async searchAvailableCandidates(committeeKey: string, searchTerm: string) {
+      const searchId = ++availableSearchId
+      try {
+        const candidates = await getAvailableCandidates(committeeKey, searchTerm)
+        if (searchId !== availableSearchId) return
+
+        this.availableCandidates = candidates
+        this.availableSearchTerm = searchTerm
+      } catch (err) {
+        if (searchId !== availableSearchId) return
+        this.availableCandidates = []
+        this.availableSearchTerm = searchTerm
+        console.error('Failed to search candidates to add to the committee', err)
+        useNotificationStore().error(err)
+      }
+    },
+
+    clearAvailableCandidates() {
+      // Also drops the response of a search that is still running
+      availableSearchId++
+      this.availableCandidates = []
+      this.availableSearchTerm = null
+    },
+
+    // TODO: call the server once the service exists - for now the change is kept in memory only
+    addCandidateToCommittee(candidate: Candidate): boolean {
+      const group = this.groups.find((g) => g.id === ADD_TO_COMMITTEE_GROUP_ID)
+      if (!group) return false
+
+      const alreadyInCommittee = this.groups.some((g) =>
+        g.candidates.some((c) => c.pernr === candidate.pernr)
+      )
+      if (!alreadyInCommittee) group.candidates.unshift(candidate)
+
+      this.availableCandidates = this.availableCandidates.filter((c) => c.pernr !== candidate.pernr)
+      return !alreadyInCommittee
     },
   },
 })

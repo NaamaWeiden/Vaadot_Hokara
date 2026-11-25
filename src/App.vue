@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <router-view />
+    <AppSnackbar />
     <GenericPopup
       :model-value="appStore.isUnauthorized"
       persistent
@@ -19,6 +20,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import GenericPopup from './components/GenericPopup.vue'
+import AppSnackbar from './components/AppSnackbar.vue'
 import { useAppStore } from './stores/appStore'
 
 const { t } = useI18n()

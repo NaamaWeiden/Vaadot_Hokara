@@ -45,12 +45,12 @@ const MIN_NAME_LETTERS = 3
 
 // The term to send to the server when searching for candidates to add, or null while the input is too short.
 // Only digits = a pernr (needs 6 digits); anything with letters = a name (needs 3 letters, digits are kept in it).
-// Spaces are not counted; the term is sent trimmed, with its inner spaces.
+// Spaces are not counted; a pernr is sent without spaces, a name is sent trimmed, with its inner spaces.
 export function getCandidateSearchTerm(input: string): string | null {
   const term = input.trim()
   const chars = term.replace(/\s/g, '')
   if (/^\d+$/.test(chars)) {
-    return chars.length >= MIN_PERNR_DIGITS ? term : null
+    return chars.length >= MIN_PERNR_DIGITS ? chars : null
   }
   const letters = chars.match(/\p{L}/gu)?.length ?? 0
   return letters >= MIN_NAME_LETTERS ? term : null

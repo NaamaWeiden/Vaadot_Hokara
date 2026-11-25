@@ -11,27 +11,11 @@
           class="flex-1-1-0"
           :groups="candidatesStore.groups"
           :loading="candidatesStore.isLoading"
+          :committee-key="selectedCommittee?.key"
           @move-candidate="moveCandidate"
         />
       </div>
     </v-main>
-
-    <!-- Undo bar after a candidate was moved (by drag or by the row menu). :key restarts the 5s timer on every move -->
-    <v-snackbar
-      :key="undoKey"
-      v-model="undoVisible"
-      :timeout="5000"
-      location="bottom"
-    >
-      <template v-if="lastMove">
-        {{ t('candidates.undo.message', { name: lastMove.name, status: lastMove.toTitle }) }}
-      </template>
-      <template #actions>
-        <v-btn color="primary" variant="text" @click="undoMove">
-          {{ t('candidates.undo.action') }}
-        </v-btn>
-      </template>
-    </v-snackbar>
   </div>
 </template>
 
@@ -43,27 +27,17 @@ import RightSidebar from '@/components/RightSidebar.vue'
 import CandidatesTable from '@/components/CandidatesTable.vue'
 import CommitteeHeader from '@/components/CommitteeHeader.vue'
 import { useCandidatesStore } from '@/stores/candidatesStore'
+import { useNotificationStore } from '@/stores/notificationStore'
 import type { Committee } from '@/types/treeTypes'
-
-interface LastMove {
-  pernr: string
-  name: string
-  fromGroupId: string
-  fromIndex: number
-  toGroupId: string
-  toTitle: string
-}
 
 const { width } = useDisplay()
 const { t } = useI18n()
 const candidatesStore = useCandidatesStore()
+const notification = useNotificationStore()
 
 const selectedCommittee = ref<Committee | null>(null)
 
-const lastMove = ref<LastMove | null>(null)
-const undoVisible = ref(false)
-const undoKey = ref(0)
-
+// After a move (by drag or by the row menu) a success message offers to undo it
 function moveCandidate(pernr: string, fromGroupId: string, toGroupId: string) {
   const fromGroup = candidatesStore.groups.find((group) => group.id === fromGroupId)
   const toGroup = candidatesStore.groups.find((group) => group.id === toGroupId)
@@ -72,25 +46,15 @@ function moveCandidate(pernr: string, fromGroupId: string, toGroupId: string) {
   const source = candidatesStore.moveCandidate(pernr, fromGroupId, toGroupId)
   if (!source || !candidate || !toGroup) return
 
-  lastMove.value = {
-    pernr,
-    name: candidate.name,
-    fromGroupId: source.fromGroupId,
-    fromIndex: source.fromIndex,
-    toGroupId,
-    toTitle: toGroup.title,
-  }
-  undoKey.value++
-  undoVisible.value = true
-}
-
-// Moves the candidate back to the group and the position it came from
-function undoMove() {
-  const move = lastMove.value
-  if (!move) return
-  candidatesStore.moveCandidate(move.pernr, move.toGroupId, move.fromGroupId, move.fromIndex)
-  lastMove.value = null
-  undoVisible.value = false
+  notification.success(
+    t('candidates.undo.message', { name: candidate.name, status: toGroup.title }),
+    {
+      text: t('candidates.undo.action'),
+      // Moves the candidate back to the group and the position it came from
+      onClick: () =>
+        candidatesStore.moveCandidate(pernr, toGroupId, source.fromGroupId, source.fromIndex),
+    }
+  )
 }
 
 // TODO: later, load the candidates of the committee selected in the sidebar
@@ -98,10 +62,10 @@ onMounted(() => {
   candidatesStore.loadCandidates()
 })
 
-// Determine responsive width (e.g. 20vw, but constrained to reasonable min/max)
+// Determine responsive width (15vw, constrained to reasonable min/max)
 // This ensures Vuetify's v-main layout logic correctly pads the main content
 const sidebarWidth = computed(() => {
-  return Math.max(280, Math.min(width.value * 0.17, 340))
+  return Math.max(250, Math.min(width.value * 0.15, 300))
 })
 </script>
 

@@ -12,7 +12,13 @@
 
     <div class="details-panel">
       <Btn :text="t('sidebar.createCommittee')" icon="mdi-plus-box-outline" :isPrimary="true" />
-      <Btn :text="t('sidebar.manageQuotas')" icon="mdi-database-cog-outline" :isPrimary="true" />
+      <!-- Hidden for now - change v-if to true to show quota management again -->
+      <Btn
+        v-if="false"
+        :text="t('sidebar.manageQuotas')"
+        icon="mdi-database-cog-outline"
+        :isPrimary="true"
+      />
     </div>
 
     <v-divider />
@@ -98,13 +104,14 @@ const search = ref('')
 
 .details-panel {
   display: flex;
+  justify-content: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-md) 0.75rem;
 }
 
-/* The two action buttons share the row equally, so they fit the narrower sidebar */
+/* Buttons keep their natural width and the row is centered */
 .details-panel > .btn {
-  flex: 1 1 0;
+  flex: 0 0 auto;
   justify-content: center;
   padding-inline: var(--spacing-sm);
 }

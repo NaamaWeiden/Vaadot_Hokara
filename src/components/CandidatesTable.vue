@@ -8,7 +8,7 @@
     <!-- Top bar: actions + search (fixed, does not scroll) -->
     <div class="d-flex align-center justify-space-between ga-4 py-3 px-4 flex-shrink-0">
       <div class="d-flex ga-2">
-        <Btn :text="t('candidates.addToCommittee')" icon="mdi-account-plus-outline" />
+        <AddToCommitteeMenu :committee-key="committeeKey" />
         <Btn :text="t('candidates.loadFromExcel')" icon="mdi-tray-arrow-up" />
       </div>
 
@@ -150,6 +150,7 @@ import { useCandidatesTable } from '@/composables/useCandidatesTable'
 import { getCandidateValue } from '@/utils/candidates.utils'
 import { useCandidateDrag } from '@/composables/useCandidateDrag'
 import Btn from './Btn.vue'
+import AddToCommitteeMenu from './AddToCommitteeMenu.vue'
 import ColumnFilterMenu from './ColumnFilterMenu.vue'
 import CandidateGroup from './CandidateGroup.vue'
 import CandidateRow from './CandidateRow.vue'
@@ -159,6 +160,8 @@ import NoContent from './NoContent.vue'
 const props = defineProps<{
   groups: CandidateGroupType[]
   loading: boolean
+  // The committee selected in the sidebar (undefined while none is selected)
+  committeeKey?: string
 }>()
 
 const emit = defineEmits<{

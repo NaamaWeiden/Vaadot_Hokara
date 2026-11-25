@@ -2,6 +2,10 @@
   "system-name": "ועדות הוקרה",
   "close": "סגור",
   "noResults": "לא נמצאו תוצאות",
+  "notifications": {
+    "genericError": "אירעה שגיאה, נסה שוב מאוחר יותר",
+    "addedToCommittee": "{name} נוסף לועדה בהצלחה"
+  },
   "unauthorized": {
       "title": "אין הרשאה",
       "message": "אין לך הרשאה לגשת למערכת זו."
@@ -18,6 +22,7 @@
   },
   "candidates": {
     "addToCommittee": "הוספה לועדה",
+    "addCandidate": "הוסף לועדה",
     "loadFromExcel": "טעינה מאקסל",
     "searchPlaceholder": "חפש לפי תיאור (מ\"א, שם, ...)",
     "emptyGroup": "אין מועמדים",
