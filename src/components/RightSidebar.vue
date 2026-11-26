@@ -11,7 +11,12 @@
     </div>
 
     <div class="details-panel">
-      <Btn :text="t('sidebar.createCommittee')" icon="mdi-plus-box-outline" :isPrimary="true" />
+      <Btn
+        :text="t('sidebar.createCommittee')"
+        icon="mdi-plus-box-outline"
+        :isPrimary="true"
+        @clicked="emit('create-committee')"
+      />
       <!-- Hidden for now - change v-if to true to show quota management again -->
       <Btn
         v-if="false"
@@ -54,6 +59,7 @@ import type { Committee } from '@/types/treeTypes'
 
 const emit = defineEmits<{
   (e: 'select-committee', committee: Committee | null): void
+  (e: 'create-committee'): void
 }>()
 
 const { t } = useI18n()

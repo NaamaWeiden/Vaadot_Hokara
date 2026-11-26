@@ -4,7 +4,9 @@
   "noResults": "לא נמצאו תוצאות",
   "notifications": {
     "genericError": "אירעה שגיאה, נסה שוב מאוחר יותר",
-    "addedToCommittee": "{name} נוסף לועדה בהצלחה"
+    "addedToCommittee": "{name} נוסף לועדה בהצלחה",
+    "committeeCreated": "הועדה {name} נוצרה בהצלחה",
+    "committeeUpdated": "הועדה {name} עודכנה בהצלחה"
   },
   "unauthorized": {
       "title": "אין הרשאה",
@@ -18,7 +20,28 @@
   },
   "committee": {
     "edit": "עריכת ועדה",
-    "link": "קישור לוועדה"
+    "link": "קישור לוועדה",
+    "form": {
+      "createTitle": "יצירת ועדה",
+      "editTitle": "עריכת ועדה",
+      "save": "שמור",
+      "cancel": "בטל",
+      "fields": {
+        "name": "שם ועדה",
+        "type": "סוג",
+        "unit": "פיקוד/יחידה/חייל עליון",
+        "startDate": "ת.תחילה",
+        "endDate": "ת.סיום",
+        "managers": "אחראי ועדה(עריכה)",
+        "viewers": "הרשאות צפייה וכתיבת הערות בלבד",
+        "displayColumns": "שדות להצגה (עד 10 עמודות, גרור לשינוי הסדר)"
+      },
+      "placeholders": {
+        "name": "לדוגמה: כנס סיכום שנת 2024",
+        "searchPeople": "חפש אנשים ...",
+        "selectColumns": "בחר שדות..."
+      }
+    }
   },
   "candidates": {
     "addToCommittee": "הוספה לועדה",
